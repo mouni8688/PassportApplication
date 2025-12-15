@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Passport Status</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header"></div>
+
+<div class="container">
+    <h2>Update Passport Status</h2>
+
+    <input id="appNo" placeholder="Application Number">
+
+    <select id="status">
+        <option value="SUBMITTED">SUBMITTED</option>
+        <option value="VERIFICATION">VERIFICATION</option>
+        <option value="PROCESSING">PROCESSING</option>
+        <option value="PRINTING">PRINTING</option>
+        <option value="DISPATCHED">DISPATCHED</option>
+        <option value="DELIVERED">DELIVERED</option>
+    </select>
+
+    <button onclick="updateStatus()">Update</button>
+
+    <pre id="msg"></pre>
+</div>
+
+<script>
+async function updateStatus() {
+    const body = {
+        application_number: document.getElementById("appNo").value,
+        status: document.getElementById("status").value
+    };
+
+    const res = await fetch("/api/status/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    document.getElementById("msg").innerText = data.message;
+}
+</script>
+<script src="header.js"></script>
+<script>
+    loadHeader("user");   // or "admin"
+</script>
+
+</body>
+</html>

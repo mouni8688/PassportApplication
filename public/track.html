@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Track Passport Application</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .status-box {
+            background: #ffffff;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #0078ff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .status-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        .no-data {
+            color: red;
+            font-size: 16px;
+        }
+        .back-btn {
+            margin-top: 20px;
+            background: #444;
+        }
+    </style>
+</head>
+<body>
+<div id="header"></div>
+
+<div class="container">
+    <h2>Track Your Passport Application</h2>
+
+    <input id="appNo" type="text" placeholder="Enter Application Number">
+
+    <button onclick="track()">Track Application</button>
+
+    <div id="result"></div>
+
+    <button class="back-btn" onclick="location.href='user-home.html'">Back</button>
+</div>
+
+<script>
+async function track() {
+    const appNo = document.getElementById("appNo").value.trim();
+    const resultBox = document.getElementById("result");
+
+    if (!appNo) {
+        resultBox.innerHTML = "<p class='no-data'>Please enter an application number.</p>";
+        return;
+    }
+
+    resultBox.innerHTML = "<p>Loading...</p>";
+
+    try {
+        const res = await fetch(`/api/status/track/${appNo}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+            resultBox.innerHTML = `<p class='no-data'>${data.message}</p>`;
+            return;
+        }
+
+        let html = `
+            <div class="status-box">
+                <h3>Applicant: ${data[0].fullname}</h3>
+                <p><b>Passport No:</b> ${data[0].passport_number || "Not Assigned"}</p>
+                <h4>Status Timeline:</h4>
+        `;
+
+        data.forEach(row => {
+            html += `
+                <div class="status-item">
+                    <b>${row.status}</b><br>
+                    <small>${new Date(row.updated_at).toLocaleString()}</small>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+
+        resultBox.innerHTML = html;
+
+    } catch (err) {
+        resultBox.innerHTML = "<p class='no-data'>Error fetching data.</p>";
+    }
+}
+</script>
+
+<script src="header.js"></script>
+<script>
+    loadHeader("user");   // or "admin"
+</script>
+
+
+</body>
+</html>

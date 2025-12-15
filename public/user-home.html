@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="header"></div>
+
+<div class="container center">
+    <h2>User Dashboard</h2>
+
+    <button onclick="location.href='apply.html'">Apply for Passport</button>
+    <button onclick="location.href='track.html'">Track Passport</button>
+
+    <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+function logout() {
+    localStorage.removeItem("user");
+    location.href = "login.html";
+}
+</script>
+<script src="header.js"></script>
+<script>
+    loadHeader("user");   // or "admin"
+</script>
+
+</body>
+</html>

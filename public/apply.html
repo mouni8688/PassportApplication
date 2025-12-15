@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Apply for Passport</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <h2>Passport Application Form</h2>
+
+    <input id="appNo" placeholder="Application Number">
+    <input id="fullname" placeholder="Full Name">
+    <input id="dob" type="date">
+    <input id="nationality" placeholder="Nationality">
+
+    <button onclick="apply()">Submit Application</button>
+
+    <pre id="msg"></pre>
+</div>
+
+<script>
+async function apply() {
+    const body = {
+        application_number: document.getElementById("appNo").value,
+        fullname: document.getElementById("fullname").value,
+        dob: document.getElementById("dob").value,
+        nationality: document.getElementById("nationality").value
+    };
+
+    const res = await fetch("/api/applicants/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    document.getElementById("msg").innerText = data.message;
+}
+</script>
+</body>
+</html>
