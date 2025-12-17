@@ -34,6 +34,11 @@ app.use("/api/applicants", applicantRoutes);
 app.use("/api/status", statusRoutes);
 
 // Railway PORT support
+
+app.get("/", (req, res) => {
+    res.send("🚀 Passport Application Backend is Running!");
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
