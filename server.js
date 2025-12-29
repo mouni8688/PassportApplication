@@ -14,18 +14,8 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve frontend
+// serve frontend
 app.use(express.static("public"));
-
-// Test DB
-db.getConnection((err, connection) => {
-    if (err) {
-        console.error("❌ Database Connection Failed", err);
-        return;
-    }
-    console.log("✅ Database Connected!");
-    connection.release();
-});
 
 // API routes
 app.use("/api/users", userRoutes);
@@ -33,13 +23,13 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/applicants", applicantRoutes);
 app.use("/api/status", statusRoutes);
 
-// Railway PORT support
-
+// root test
 app.get("/", (req, res) => {
-    res.send("🚀 Passport Application Backend is Running!");
+  res.send("🚀 Passport Application Backend is LIVE");
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+// 🔥 THIS LINE IS CRITICAL
+const PORT = process.env.PORT;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
