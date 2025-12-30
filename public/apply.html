@@ -6,73 +6,77 @@
 </head>
 <body>
 
-    <!-- Header -->
-    <div id="header"></div>
+<!-- Header -->
+<div id="header"></div>
 
-    <div class="container">
-        <h2>Passport Application Form</h2>
+<div class="container">
+    <h2>Passport Application Form</h2>
 
-        <input id="fullname" placeholder="Full Name">
-        <input id="dob" type="date">
-        <input id="nationality" placeholder="Nationality">
+    <input id="fullname" placeholder="Full Name" required>
+    <input id="dob" type="date" required>
+    <input id="nationality" placeholder="Nationality" required>
 
-        <button onclick="apply()">Submit Application</button>
+    <button onclick="apply()">Submit Application</button>
 
-        <p id="msg"></p>
-        <div id="appBox"></div>
-    </div>
+    <p id="msg"></p>
+    <div id="appBox"></div>
+</div>
 
-    <script>
-        async function apply() {
-            const fullname = document.getElementById("fullname").value.trim();
-            const dob = document.getElementById("dob").value;
-            const nationality = document.getElementById("nationality").value.trim();
+<script>
+async function apply() {
+    const fullname = document.getElementById("fullname").value.trim();
+    const dob = document.getElementById("dob").value;
+    const nationality = document.getElementById("nationality").value.trim();
 
-            const msg = document.getElementById("msg");
-            const appBox = document.getElementById("appBox");
+    const msg = document.getElementById("msg");
+    const appBox = document.getElementById("appBox");
 
-            // ✅ Mandatory validation
-            if (!fullname || !dob || !nationality) {
-                msg.innerText = "All fields are required";
-                msg.style.color = "red";
-                return;
-            }
+    msg.innerText = "";
+    appBox.innerHTML = "";
 
-            const res = await fetch("/api/applicants/apply", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fullname, dob, nationality })
-            });
+    // ✅ Mandatory validation
+    if (!fullname || !dob || !nationality) {
+        msg.style.color = "red";
+        msg.innerText = "All fields are required";
+        return;
+    }
 
-            const data = await res.json();
+    const res = await fetch("/api/applicants/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullname, dob, nationality })
+    });
 
-            if (data.application_number) {
-                msg.style.color = "green";
-                msg.innerText = "Application submitted successfully!";
+    const data = await res.json();
 
-                appBox.innerHTML = `
-                    <p><b>Your Application Number:</b></p>
-                    <h3>${data.application_number}</h3>
-                    <p>You will be redirected to home page shortly...</p>
-                `;
+    if (data.application_number) {
+        msg.style.color = "green";
+        msg.innerText = "Application submitted successfully!";
 
-                // ✅ Redirect to user home after 3 seconds
-                setTimeout(() => {
-                    window.location.href = "user-home.html";
-                }, 3000);
+        appBox.innerHTML = `
+            <p><strong>Your Application Number</strong></p>
+            <h3>${data.application_number}</h3>
+            <p>Please save this number for tracking.</p>
+            <p>Redirecting to home page...</p>
+        `;
 
-            } else {
-                msg.style.color = "red";
-                msg.innerText = data.message;
-            }
-        }
-    </script>
+        // ✅ Redirect after 3 seconds
+        setTimeout(() => {
+            window.location.href = "user-home.html";
+        }, 3000);
 
-    <!-- Header script -->
-    <script src="header.js"></script>
-    <script>
-        loadHeader("user");
-    </script>
+    } else {
+        msg.style.color = "red";
+        msg.innerText = data.message || "Application failed";
+    }
+}
+</script>
+
+<!-- Header Script -->
+<script src="header.js"></script>
+<script>
+    loadHeader("user");
+</script>
 
 </body>
 </html>

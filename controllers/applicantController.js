@@ -24,7 +24,7 @@ function generateApplicationNumber(fullname, dob) {
 const createApplicant = (req, res) => {
     const { fullname, dob, nationality } = req.body;
 
-    // ❌ User should NOT send application_number
+    // ✅ Mandatory validation
     if (!fullname || !dob || !nationality) {
         return res.status(400).json({
             message: "All fields are required."
@@ -44,13 +44,13 @@ const createApplicant = (req, res) => {
                 });
             }
 
-            // Default initial status
+            // ✅ Add default status
             Status.addStatus(application_number, "SUBMITTED", () => {});
 
-            // ✅ Send application number back to user
+            // ✅ Send response to frontend
             res.json({
                 message: "Application submitted successfully!",
-                application_number: application_number
+                application_number
             });
         }
     );
