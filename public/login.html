@@ -4,15 +4,19 @@
     <title>User Login</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <div id="header"></div>
 
+<body>
+
+<!-- 🔥 Clear any old session when login page loads -->
+<script>
+    localStorage.removeItem("user");
+</script>
 
 <div class="container">
     <h2>User Login</h2>
 
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+    <input id="email" placeholder="Email" required>
+    <input id="password" type="password" placeholder="Password" required>
 
     <button onclick="loginUser()">Login</button>
     <p id="msg"></p>
@@ -20,33 +24,35 @@
 
 <script>
 async function loginUser() {
-    const body = {
-        email: document.getElementById("email").value,
-        password: document.getElementById("password").value
-    };
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+        document.getElementById("msg").innerText = "All fields are required";
+        return;
+    }
 
     const res = await fetch("/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+        body: JSON.stringify({ email, password })
     });
 
     const data = await res.json();
 
     if (data.success) {
+        // ✅ Normalize user name (Sri instead of sri)
+        data.user.name =
+            data.user.name.charAt(0).toUpperCase() +
+            data.user.name.slice(1).toLowerCase();
+
         localStorage.setItem("user", JSON.stringify(data.user));
-        location.href = "user-home.html";
+        window.location.href = "user-home.html";
     } else {
         document.getElementById("msg").innerText = data.message;
     }
 }
 </script>
-
-<script src="header.js"></script>
-<script>
-    loadHeader("user");   // or "admin"
-</script>
-
 
 </body>
 </html>
