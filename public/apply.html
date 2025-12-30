@@ -5,27 +5,37 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
 <div class="container">
     <h2>Passport Application Form</h2>
 
-    <input id="appNo" placeholder="Application Number">
     <input id="fullname" placeholder="Full Name">
     <input id="dob" type="date">
     <input id="nationality" placeholder="Nationality">
 
     <button onclick="apply()">Submit Application</button>
 
-    <pre id="msg"></pre>
+    <p id="msg"></p>
+    <div id="appBox"></div>
 </div>
 
 <script>
 async function apply() {
-    const body = {
-        application_number: document.getElementById("appNo").value,
-        fullname: document.getElementById("fullname").value,
-        dob: document.getElementById("dob").value,
-        nationality: document.getElementById("nationality").value
-    };
+    const fullname = document.getElementById("fullname").value.trim();
+    const dob = document.getElementById("dob").value;
+    const nationality = document.getElementById("nationality").value.trim();
+
+    const msg = document.getElementById("msg");
+    const appBox = document.getElementById("appBox");
+
+    // ✅ Mandatory validation
+    if (!fullname || !dob || !nationality) {
+        msg.innerText = "All fields are required";
+        msg.style.color = "red";
+        return;
+    }
+
+    const body = { fullname, dob, nationality };
 
     const res = await fetch("/api/applicants/apply", {
         method: "POST",
@@ -34,8 +44,30 @@ async function apply() {
     });
 
     const data = await res.json();
-    document.getElementById("msg").innerText = data.message;
+
+    if (data.application_number) {
+        msg.style.color = "green";
+        msg.innerText = "Application submitted successfully!";
+
+        appBox.innerHTML = `
+            <p><b>Your Application Number:</b></p>
+            <h3>${data.application_number}</h3>
+            <button onclick="copyAppNo('${data.application_number}')">
+                Copy Application Number
+            </button>
+        `;
+    } else {
+        msg.style.color = "red";
+        msg.innerText = data.message;
+    }
+}
+
+// Copy to clipboard
+function copyAppNo(appNo) {
+    navigator.clipboard.writeText(appNo);
+    alert("Application number copied!");
 }
 </script>
+
 </body>
 </html>
