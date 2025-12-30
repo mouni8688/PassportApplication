@@ -6,68 +6,73 @@
 </head>
 <body>
 
-<div class="container">
-    <h2>Passport Application Form</h2>
+    <!-- Header -->
+    <div id="header"></div>
 
-    <input id="fullname" placeholder="Full Name">
-    <input id="dob" type="date">
-    <input id="nationality" placeholder="Nationality">
+    <div class="container">
+        <h2>Passport Application Form</h2>
 
-    <button onclick="apply()">Submit Application</button>
+        <input id="fullname" placeholder="Full Name">
+        <input id="dob" type="date">
+        <input id="nationality" placeholder="Nationality">
 
-    <p id="msg"></p>
-    <div id="appBox"></div>
-</div>
+        <button onclick="apply()">Submit Application</button>
 
-<script>
-async function apply() {
-    const fullname = document.getElementById("fullname").value.trim();
-    const dob = document.getElementById("dob").value;
-    const nationality = document.getElementById("nationality").value.trim();
+        <p id="msg"></p>
+        <div id="appBox"></div>
+    </div>
 
-    const msg = document.getElementById("msg");
-    const appBox = document.getElementById("appBox");
+    <script>
+        async function apply() {
+            const fullname = document.getElementById("fullname").value.trim();
+            const dob = document.getElementById("dob").value;
+            const nationality = document.getElementById("nationality").value.trim();
 
-    // ✅ Mandatory validation
-    if (!fullname || !dob || !nationality) {
-        msg.innerText = "All fields are required";
-        msg.style.color = "red";
-        return;
-    }
+            const msg = document.getElementById("msg");
+            const appBox = document.getElementById("appBox");
 
-    const body = { fullname, dob, nationality };
+            // ✅ Mandatory validation
+            if (!fullname || !dob || !nationality) {
+                msg.innerText = "All fields are required";
+                msg.style.color = "red";
+                return;
+            }
 
-    const res = await fetch("/api/applicants/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-    });
+            const res = await fetch("/api/applicants/apply", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fullname, dob, nationality })
+            });
 
-    const data = await res.json();
+            const data = await res.json();
 
-    if (data.application_number) {
-        msg.style.color = "green";
-        msg.innerText = "Application submitted successfully!";
+            if (data.application_number) {
+                msg.style.color = "green";
+                msg.innerText = "Application submitted successfully!";
 
-        appBox.innerHTML = `
-            <p><b>Your Application Number:</b></p>
-            <h3>${data.application_number}</h3>
-            <button onclick="copyAppNo('${data.application_number}')">
-                Copy Application Number
-            </button>
-        `;
-    } else {
-        msg.style.color = "red";
-        msg.innerText = data.message;
-    }
-}
+                appBox.innerHTML = `
+                    <p><b>Your Application Number:</b></p>
+                    <h3>${data.application_number}</h3>
+                    <p>You will be redirected to home page shortly...</p>
+                `;
 
-// Copy to clipboard
-function copyAppNo(appNo) {
-    navigator.clipboard.writeText(appNo);
-    alert("Application number copied!");
-}
-</script>
+                // ✅ Redirect to user home after 3 seconds
+                setTimeout(() => {
+                    window.location.href = "user-home.html";
+                }, 3000);
+
+            } else {
+                msg.style.color = "red";
+                msg.innerText = data.message;
+            }
+        }
+    </script>
+
+    <!-- Header script -->
+    <script src="header.js"></script>
+    <script>
+        loadHeader("user");
+    </script>
 
 </body>
 </html>
