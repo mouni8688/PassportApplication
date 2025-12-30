@@ -25,21 +25,20 @@
 <script>
 async function apply() {
     const fullname = document.getElementById("fullname").value.trim();
-    const dob = document.getElementById("dob").value;
+    const dobInput = document.getElementById("dob").value;
     const nationality = document.getElementById("nationality").value.trim();
 
     const msg = document.getElementById("msg");
     const appBox = document.getElementById("appBox");
 
-    msg.innerText = "";
-    appBox.innerHTML = "";
-
-    // ✅ Mandatory validation
-    if (!fullname || !dob || !nationality) {
-        msg.style.color = "red";
+    if (!fullname || !dobInput || !nationality) {
         msg.innerText = "All fields are required";
+        msg.style.color = "red";
         return;
     }
+
+    // ✅ ENSURE yyyy-mm-dd
+    const dob = new Date(dobInput).toISOString().split("T")[0];
 
     const res = await fetch("/api/applicants/apply", {
         method: "POST",
@@ -54,29 +53,21 @@ async function apply() {
         msg.innerText = "Application submitted successfully!";
 
         appBox.innerHTML = `
-            <p><strong>Your Application Number</strong></p>
+            <p><b>Your Application Number:</b></p>
             <h3>${data.application_number}</h3>
-            <p>Please save this number for tracking.</p>
-            <p>Redirecting to home page...</p>
+            <p>You will be redirected to home page shortly...</p>
         `;
 
-        // ✅ Redirect after 3 seconds
         setTimeout(() => {
             window.location.href = "user-home.html";
         }, 3000);
-
     } else {
         msg.style.color = "red";
-        msg.innerText = data.message || "Application failed";
+        msg.innerText = data.message;
     }
 }
 </script>
-
-<!-- Header Script -->
 <script src="header.js"></script>
-<script>
-    loadHeader("user");
-</script>
 
 </body>
 </html>
