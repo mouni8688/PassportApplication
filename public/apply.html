@@ -25,49 +25,59 @@
 <script>
 async function apply() {
     const fullname = document.getElementById("fullname").value.trim();
-    const dobInput = document.getElementById("dob").value;
+    const dob = document.getElementById("dob").value; // ✅ USE DIRECTLY
     const nationality = document.getElementById("nationality").value.trim();
 
     const msg = document.getElementById("msg");
     const appBox = document.getElementById("appBox");
 
-    if (!fullname || !dobInput || !nationality) {
-        msg.innerText = "All fields are required";
+    msg.innerText = "";
+    appBox.innerHTML = "";
+
+    // ✅ Validation
+    if (!fullname || !dob || !nationality) {
         msg.style.color = "red";
+        msg.innerText = "All fields are required.";
         return;
     }
 
-    // ✅ ENSURE yyyy-mm-dd
-    const dob = new Date(dobInput).toISOString().split("T")[0];
+    try {
+        const res = await fetch("/api/applicants/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fullname, dob, nationality })
+        });
 
-    const res = await fetch("/api/applicants/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullname, dob, nationality })
-    });
+        const data = await res.json();
 
-    const data = await res.json();
+        if (data.application_number) {
+            msg.style.color = "green";
+            msg.innerText = "Application submitted successfully!";
 
-    if (data.application_number) {
-        msg.style.color = "green";
-        msg.innerText = "Application submitted successfully!";
+            appBox.innerHTML = `
+                <p><b>Your Application Number:</b></p>
+                <h3>${data.application_number}</h3>
+                <p>You will be redirected to home page shortly...</p>
+            `;
 
-        appBox.innerHTML = `
-            <p><b>Your Application Number:</b></p>
-            <h3>${data.application_number}</h3>
-            <p>You will be redirected to home page shortly...</p>
-        `;
-
-        setTimeout(() => {
-            window.location.href = "user-home.html";
-        }, 3000);
-    } else {
+            setTimeout(() => {
+                window.location.href = "user-home.html";
+            }, 3000);
+        } else {
+            msg.style.color = "red";
+            msg.innerText = data.message || "Something went wrong";
+        }
+    } catch (err) {
         msg.style.color = "red";
-        msg.innerText = data.message;
+        msg.innerText = "Server error. Please try again.";
     }
 }
 </script>
+
 <script src="header.js"></script>
+<script>
+    loadHeader("user");
+</script>
 
 </body>
 </html>
